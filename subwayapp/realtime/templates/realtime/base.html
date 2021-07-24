@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>
+        {% block title %}
+        {% endblock %}
+    </title>
+
+    <!-- font -->
+    <link href="http://fonts.googleapis.com/earlyaccess/hanna.css" rel="stylesheet">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <!-- jquery, ajax, autocomplete get -->
+    <script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <!-- counter static js file get -->
+    {% load static %}
+    <script src="{% static 'batch/js/Counter-Up-master/jquery.counterup.min.js' %}"></script>
+    <script src="{% static 'batch/js/Counter-Up-master/jquery.counterup.js' %}"></script>
+    <script src="{% static 'batch/js/Counter-Up-master/jquery.waypoints.js' %}"></script>
+
+</head>
+
+<script>
+
+    // 한 줄씩 출력하는 애니메이션
+    $(document).ready(function () {
+        var jbTime = 1000;
+        $('.jb-1').animate({
+            opacity: '1'
+        }, jbTime);
+    });
+
+</script>
+
+{% block script %}
+{% endblock %}
+
+<body>
+
+    <div class="container">
+
+        <p>실시간 지하철 도착 정보</p>
+
+        <button class="batchBtn" onclick="location.href='/batch'">배치 통계 정보</button>
+        <button class="homeBtn" onclick="location.href='/'">홈으로 |</button>
+
+        <br>
+
+        {% block content %}
+        {% endblock %}
+
+    </div>
+
+</body>
+
+<style>
+    .container {
+        text-align: center;
+        position: relative;
+        font-size: 30px;
+        font-weight: 500;
+        font-family: Hanna;
+        top: 35px;
+    }
+
+    .container-sub-1 {
+        text-align: left;
+        float: left;
+        height: 315px;
+        border: 5px solid;
+        font-size: 21px;
+    }
+
+    p {
+        font-size: 35px;
+        position: relative;
+        bottom: 15px;
+    }
+
+    .homeBtn {
+        position: relative;
+        float: right;
+        font-family: Hanna;
+        background-color: white;
+        font-size: 25px;
+        border: none;
+    }
+
+    .batchBtn {
+        position: relative;
+        float: right;
+        font-family: Hanna;
+        background-color: white;
+        font-size: 25px;
+        border: none;
+    }
+</style>
+{% block style %}
+{% endblock %}
+
+</html>

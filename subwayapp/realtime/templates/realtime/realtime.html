@@ -1,0 +1,306 @@
+{% extends 'realtime/base.html' %}
+
+{% block title %}실시간 지하철 도착 정보 페이지{% endblock %}
+
+{% block script %}
+<script>
+
+    // 호선별 색상 변경
+    const pasing_json_color = "{{ json_data_color }}".replace(/&#x27;/g, "\"");
+    const line_color = JSON.parse(pasing_json_color);
+
+    // 연관 검색어 추천
+    const pasing_json_substanm = "{{ json_data_substanm }}".replace(/&#x27;/g, "\"");
+    const json_substanm = JSON.parse(pasing_json_substanm);
+    const substanm_list = json_substanm['전체역']
+
+    $(function () {
+        $('.selectSTAname').autocomplete({
+            source: substanm_list,
+            focus: function (event, ui) {
+                return false;
+            },
+            open: function (event, ui) {
+                $(this).autocomplete("widget").css({
+                    "font-size": 15,
+                    "font-family": "Hanna"
+                });
+            },
+            minLength: 1,
+            autoFocus: true,
+        });
+    });
+
+    // 역명 선택 후 버튼 클릭 시
+    function viewDirection() {
+
+        let subway_name = document.querySelector('.selectSTAname').value;
+        let json_subway_name = {
+            'name': subway_name
+        }
+
+        $.ajax({
+            url: "{% url 'selectsubwayAjax_realtime_selectSubstanm' %}",
+            type: 'POST',
+            data: json_subway_name,
+            dataType: 'json',
+            success: function (direction_list) {
+
+                let direction_list_str = ''
+
+                for (var i in direction_list.list) {
+                    direction_list_str += '<input type="button" class="selectDirectionBtn" value="' + direction_list.list[i] + '" onclick="selectDirection(this.value)" />'
+                }
+
+                $('.list_area').html(direction_list_str);
+
+            },
+            error: function (request, status, error) {
+                alert("입력 오류 혹은 서버 오류 입니다 :(")
+                window.location.replace("{% url 'realtime' %}")
+            }
+        })
+
+    }
+
+    function selectDirection(value) {
+
+        let subway_name = document.querySelector('.selectSTAname').value;
+        let direction_val = value
+        let json_data_val = {
+            'name': subway_name,
+            'direction_val': direction_val
+        }
+
+        // 선택한 역명의 도착지 방면 클릭 시
+        $.ajax({
+            url: "{% url 'selectsubwayAjax_realtime_selectAll' %}",
+            type: 'POST',
+            data: json_data_val,
+            dataType: 'json',
+            success: function (json_data_result) {
+
+                let result_list = ["recptnDt", "arvlMsg3", "barvlDt", "trainLineNm", "btrainSttus", "arvlCd", "updnLine", "subwayHeading"]
+                let element_key_1 = document.querySelector('#result_key_1')
+                let element_key_2 = document.querySelector('#result_key_2')
+                let elements_1 = document.querySelectorAll('#result_1')
+                let elements_2 = document.querySelectorAll('#result_2')
+
+                // 결과값이 존재하지 않을 때
+                if (Object.keys(json_data_result).length == 0) {
+                    alert('데이터가 없습니다 :(')
+                }
+
+                // 결과값이 한 건일 때
+                else if (Object.keys(json_data_result).length == 1) {
+                    let key = Object.keys(json_data_result)[0]
+
+                    element_key_1.textContent = key
+                    for (var i in elements_1) {
+                        elements_1[i].textContent = json_data_result[key][result_list[i]]
+                    }
+
+                    element_key_2.textContent = '-'
+                    for (var i in elements_2) {
+                        elements_2[i].textContent = '-'
+                    }
+                }
+
+                // 결과값이 두 건일 때 / 도착 예정 시간 정수형(barvlDt2)이 빠른 건부터 출력
+                else {
+
+                    let select_key = Object.keys(json_data_result)
+                    if (json_data_result[select_key[0]]['barvlDt2'] > json_data_result[select_key[1]]['barvlDt2']) {
+                        var key_1 = select_key[1]
+                        var key_2 = select_key[0]
+                    }
+
+                    else if (json_data_result[select_key[0]]['barvlDt2'] < json_data_result[select_key[1]]['barvlDt2']) {
+                        var key_1 = select_key[0]
+                        var key_2 = select_key[1]
+                    }
+
+                    else {
+                        var key_1 = select_key[0]
+                        var key_2 = select_key[1]
+                    }
+
+                    element_key_1.textContent = key_1
+                    for (var i in elements_1) {
+                        elements_1[i].textContent = json_data_result[key_1][result_list[i]]
+                    }
+
+                    element_key_2.textContent = key_2
+                    for (var i in elements_2) {
+                        elements_2[i].textContent = json_data_result[key_2][result_list[i]]
+                    }
+
+                }
+
+            },
+            error: function (request, status, error) {
+                alert("입력 오류 혹은 서버 오류 입니다 :(")
+                window.location.replace("{% url 'realtime' %}")
+            }
+        })
+    }
+
+
+</script>
+{% endblock %}
+
+{% block content %}
+
+<div class="container-sub-1">
+
+
+    &nbsp;
+    <input type="text" class="selectSTAname" placeholder="역명을 입력해주세요 :)" />
+    <input type="button" class="viewDirection" value="검색" onclick="viewDirection()" />
+
+    <div class='list_area'>
+    </div>
+
+    <br>
+
+    &nbsp;
+    <span class="now_next">이번 열차</span>
+
+    <br>
+
+    <table class="result_table_1 jb-1">
+        <th>열차 번호</th>
+        <th>데이터 발생 시각</th>
+        <th>현재 위치</th>
+        <th>도착 예정 시간</th>
+        <th>종착역/방면</th>
+        <th>급행/일반</th>
+        <th>열차 상태</th>
+        <th>상/하행 내/외선</th>
+        <th>승/하차 방향</th>
+        <tr>
+            <td id="result_key_1" class="trainNo">-</td>
+            <td id="result_1" class="recptnDt">-</td>
+            <td id="result_1" class="arvlMsg3">-</td>
+            <td id="result_1" class="barvlDt">-</td>
+            <td id="result_1" class="trainLineNm">-</td>
+            <td id="result_1" class="btrainSttus">-</td>
+            <td id="result_1" class="arvlCd">-</td>
+            <td id="result_1" class="updnLine">-</td>
+            <td id="result_1" class="subwayHeading">-</td>
+        </tr>
+    </table>
+
+    <br>&nbsp;
+    <span class="now_next">다음 열차</span>
+    <br>
+
+    <table class="result_table_2 jb-1">
+        <th>열차 번호</th>
+        <th>데이터 발생 시각</th>
+        <th>현재 위치</th>
+        <th>도착 예정 시간</th>
+        <th>종착역/방면</th>
+        <th>급행/일반</th>
+        <th>열차 상태</th>
+        <th>상/하행 내/외선</th>
+        <th>승/하차 방향</th>
+        <tr>
+            <td id="result_key_2" class="trainNo">-</td>
+            <td id="result_2" class="recptnDt">-</td>
+            <td id="result_2" class="arvlMsg3">-</td>
+            <td id="result_2" class="barvlDt">-</td>
+            <td id="result_2" class="trainLineNm">-</td>
+            <td id="result_2" class="btrainSttus">-</td>
+            <td id="result_2" class="arvlCd">-</td>
+            <td id="result_2" class="updnLine">-</td>
+            <td id="result_2" class="subwayHeading">-</td>
+        </tr>
+    </table>
+
+</div>
+{% endblock %}
+
+{% block style %}
+<style>
+    .result_table_1 {
+        text-align: center;
+        position: center;
+        font-size: 17px;
+        width: 1000px;
+        border-collapse: separate;
+        border-spacing: 0 7px;
+        opacity: 0;
+    }
+
+    .result_table_2 {
+        text-align: center;
+        position: center;
+        font-size: 17px;
+        width: 1000px;
+        border-collapse: separate;
+        border-spacing: 0 7px;
+        opacity: 0;
+    }
+
+    th {
+        word-break: break-all;
+        border: 2px solid;
+    }
+
+    td {
+        word-break: break-all;
+        border: 2px solid;
+        height: 30px;
+    }
+
+    .selectSTAname {
+        position: relative;
+        top: 5px;
+        font-family: Hanna;
+        font-size: 17px;
+        width: 210px;
+    }
+
+    .viewDirection {
+        position: relative;
+        top: 5px;
+        font-family: Hanna;
+        font-size: 17px;
+        background-color: white;
+        border: 1px solid;
+        border-radius: 10px;
+    }
+
+    .ui-autocomplete {
+        max-height: 250px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+        /* add padding to account for vertical scrollbar */
+        padding-right: 5px;
+    }
+
+    .now_next {
+        font-size: 15px;
+    }
+
+    .list_area {
+        position: relative;
+        top: 15px;
+        left: 9px;
+        border: 2px solid;
+        width: 980px;
+        height: 50.07px;
+    }
+
+    .selectDirectionBtn {
+        font-family: Hanna;
+        font-size: 13.5px;
+        border: none;
+        height: 21px;
+        background-color: white;
+    }
+</style>
+
+{% endblock %}
