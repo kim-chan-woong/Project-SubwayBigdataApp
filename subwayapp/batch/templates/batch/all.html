@@ -1,0 +1,33 @@
+{% extends 'batch/base.html' %}
+
+{% block title %}전체 통계{% endblock %}
+
+{% block script %}
+{% endblock %}
+
+
+{% block content %}
+<div class="container-sub-2" style="text-align: center;">
+    <br>
+
+    <p class="jb jb-1">6년간의 수도권 지하철 전체 승차 기록은</p>
+    <b class="emp counter">{{ json_data.ride }}</b>건
+
+    <p class="jb jb-1">전체 하차 기록은</p>
+    <b class="emp counter">{{ json_data.alight }}</b>건
+    <p class="jb jb-1">이에요!:)</p>
+</div>
+{% endblock %}
+
+{% block style %}
+<style>
+    .emp {
+        font-size: 45px;
+    }
+
+    .jb {
+        font-size: 20px;
+        opacity: 0;
+    }
+</style>
+{% endblock %}

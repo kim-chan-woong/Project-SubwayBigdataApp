@@ -1,0 +1,117 @@
+{% extends 'batch/base.html' %}
+
+{% block title %}역명별 통계{% endblock %}
+
+{% block script %}
+
+<script>
+
+    // 호선별 색상 변경
+    const pasing_json_color = "{{ json_data_color }}".replace(/&#x27;/g, "\"");
+    const line_color = JSON.parse(pasing_json_color);
+
+    $(document).ready(function () {
+        $('.changeColor').each(function (index, element) {
+            var selectLine = element.innerHTML
+            $(`.changeColor:contains(${selectLine})`).css("color", line_color[selectLine]);
+        })
+    });
+
+    // 승, 하차 선택 시 해당 버튼, 테이블, 차트 표현
+    function rideBtnonclick() {
+        $('#ride_table').show();
+        $('#alight_table').hide();
+        $('#rideBtn').css({ "font-size": 23, "text-decoration": "underline" })
+        $('#alightBtn').css({ "font-size": 15, "text-decoration": "none" })
+    }
+
+    function alightBtnonclick() {
+        $('#ride_table').hide();
+        $('#alight_table').show();
+        $('#rideBtn').css({ "font-size": 15, "text-decoration": "none" })
+        $('#alightBtn').css({ "font-size": 23, "text-decoration": "underline" })
+    }
+</script>
+{% endblock %}
+
+
+{% block content %}
+<div class="container-sub-2">
+
+    <button id="rideBtn" class="select_ride_alight" style="font-size: 23px; text-decoration: underline;"
+        onclick="rideBtnonclick();">승차</button>
+    <button id="alightBtn" class="select_ride_alight" style="font-size: 15px;" onclick="alightBtnonclick();">하차</button>
+
+    <!-- 승차 테이블 -->
+    <table id="ride_table" class="result_table jb-1" style="display: inline-flexbox;">
+        <th>순위</th>
+        <th>역명</th>
+        <th>호선</th>
+        <th>승차(건)</th>
+        {% for key, value in json_data_ride.items %}
+        <tr>
+            <td>{{ key }}</td>
+            <td>{{ value.sub_sta_nm }}</td>
+            <td class="line_numTD">
+                {% for i in value.line_num %}
+                <span class="changeColor">{{ i }}</span>
+                {% endfor %}
+            </td>
+            <td class="counter">{{ value.ride_val }}</td>
+        </tr>
+        {% endfor %}
+
+    </table>
+
+    <!-- 하차 테이블 -->
+    <table id="alight_table" class="result_table jb-1" style="display: none;">
+        <th>순위</th>
+        <th>역명</th>
+        <th>호선</th>
+        <th>하차(건)</th>
+        {% for key, value in json_data_alight.items %}
+        <tr>
+            <td>{{ key }}</td>
+            <td>{{ value.sub_sta_nm }}</td>
+            <td class="line_numTD">
+                {% for i in value.line_num %}
+                <span class="changeColor">{{ i }}</span>
+                {% endfor %}
+            </td>
+            <td class="counter">{{ value.alight_val }}</td>
+        </tr>
+        {% endfor %}
+
+    </table>
+</div>
+{% endblock %}
+
+{% block style %}
+<style>
+    .result_table {
+        text-align: center;
+        border: none;
+        font-size: 17px;
+        width: 700px;
+        border-collapse: separate;
+        border-spacing: 0 7px;
+        opacity: 0;
+    }
+
+    td {
+        width: 150px;
+        word-break: break-all;
+    }
+
+    .line_numTD {
+        width: 300px;
+        word-break: break-all;
+    }
+
+    .select_ride_alight {
+        border: none;
+        font-family: Hanna;
+        background-color: white;
+    }
+</style>
+{% endblock %}

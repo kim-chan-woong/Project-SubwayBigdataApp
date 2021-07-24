@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>
+        {% block title %}
+        {% endblock %}
+    </title>
+
+    <!-- font -->
+    <link href="http://fonts.googleapis.com/earlyaccess/hanna.css" rel="stylesheet">
+
+    <!-- jquery, ajax get -->
+    <script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+
+    <!-- counter static js file get -->
+    {% load static %}
+    <script src="{% static 'batch/js/Counter-Up-master/jquery.counterup.min.js' %}"></script>
+    <script src="{% static 'batch/js/Counter-Up-master/jquery.counterup.js' %}"></script>
+    <script src="{% static 'batch/js/Counter-Up-master/jquery.waypoints.js' %}"></script>
+
+</head>
+
+<script>
+    // 한 줄씩 출력하는 애니메이션
+    $(document).ready(function () {
+        var jbTime = 1000;
+        $('.jb-1').animate({
+            opacity: '1'
+        }, jbTime);
+    });
+
+    // 카운터 제이쿼리문
+    jQuery(document).ready(function ($) {
+        $('.counter').counterUp({
+            delay: 50,
+            time: 2000
+        });
+    });
+
+    // 현재 선택한 카테고리 강조
+    $(document).ready(function () {
+
+        var now_location = window.location.href;
+
+        if (now_location.includes('yra', 28) == true) {
+
+            var choiceBtn = document.getElementById("yraBtn").style
+            choiceBtn.fontSize = "23px";
+            choiceBtn.textDecoration = "underline";
+
+        } else if (now_location.includes('lra', 28) == true) {
+
+            var choiceBtn = document.getElementById("lraBtn").style
+            choiceBtn.fontSize = "23px";
+            choiceBtn.textDecoration = "underline";
+
+        } else if (now_location.includes('nra', 28) == true) {
+
+            var choiceBtn = document.getElementById("nraBtn").style
+            choiceBtn.fontSize = "23px";
+            choiceBtn.textDecoration = "underline";
+
+        } else if (now_location.includes('selectsubway', 28) == true) {
+
+            var choiceBtn = document.getElementById("selectsubwayBtn").style
+            choiceBtn.fontSize = "23px";
+            choiceBtn.textDecoration = "underline";
+
+        } else {
+
+            var choiceBtn = document.getElementById("araBtn").style
+            choiceBtn.fontSize = "23px";
+            choiceBtn.textDecoration = "underline";
+
+        }
+    });
+
+</script>
+
+{% block script %}
+{% endblock %}
+
+<body>
+
+    <div class="container">
+
+        <p>수도권 지하철 통계</p>
+
+        <button class="realtimeBtn" onclick="location.href='/realtime'">실시간 지하철 도착 정보</button>
+        <button class="homeBtn" onclick="location.href='/'">홈으로 |</button>
+
+        <br>
+
+        <div class="container-sub-1">
+
+            <button class="selectBatchBtn" id="araBtn" onclick="location.href='/batch'">전체 데이터 합계</button>
+            <br>
+            <button class="selectBatchBtn" id="yraBtn" onclick="location.href='/batch/yra'">연도별 추이</button>
+            <br>
+            <button class="selectBatchBtn" id="lraBtn" onclick="location.href='/batch/lra'">호선별 TOP10</button>
+            <br>
+            <button class="selectBatchBtn" id="nraBtn" onclick="location.href='/batch/nra'">역명별 TOP10</button>
+            <br>
+            <button class="selectBatchBtn" id="selectsubwayBtn" onclick="location.href='/batch/selectsubway'">원하는
+                통계</button>
+
+        </div>
+
+        {% block content %}
+        {% endblock %}
+
+    </div>
+
+</body>
+
+<style>
+    .container {
+        text-align: center;
+        position: relative;
+        font-size: 30px;
+        font-weight: 500;
+        font-family: Hanna;
+        top: 35px;
+    }
+
+    .container-sub-1 {
+        text-align: left;
+        float: left;
+        height: 315px;
+        border: 5px solid;
+    }
+
+    .container-sub-2 {
+        text-align: left;
+        border: 5px solid;
+        height: 315px;
+    }
+
+    .selectBatchBtn {
+        font-family: Hanna;
+        background-color: white;
+        padding: 23px 30px;
+        font-size: 15px;
+        border: none;
+        width: 210px;
+    }
+
+    .homeBtn {
+        position: relative;
+        float: right;
+        font-family: Hanna;
+        background-color: white;
+        font-size: 25px;
+        border: none;
+    }
+
+    .realtimeBtn {
+        position: relative;
+        float: right;
+        font-family: Hanna;
+        background-color: white;
+        font-size: 25px;
+        border: none;
+    }
+
+    p {
+        font-size: 35px;
+        position: relative;
+        bottom: 15px;
+    }
+
+    .batchBtn {
+        position: relative;
+        float: right;
+        font-family: Hanna;
+        background-color: white;
+        font-size: 25px;
+        border: none;
+    }
+</style>
+{% block style %}
+{% endblock %}
+
+</html>

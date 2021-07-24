@@ -1,0 +1,261 @@
+{% extends 'batch/base.html' %}
+
+{% block title %}호선별 통계{% endblock %}
+
+{% block script %}
+<!-- chart js get-->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+{% load static %}
+<script src="{% static 'batch/js/chartJS/chartjsPiece.js' %}"></script>
+
+<script>
+
+    const pasing_json_color = "{{ json_data_color }}".replace(/&#x27;/g, "\"");
+    const line_color = JSON.parse(pasing_json_color);
+
+    // 호선별 색상 변경 
+    $(document).ready(function () {
+        $('.changeColor').each(function (index, element) {
+            var selectLine = element.innerHTML
+            $(`.changeColor:contains(${selectLine})`).css("color", line_color[selectLine]);
+        })
+    });
+
+    // 승, 하차 선택 시 해당 버튼, 테이블, 차트 표현
+    function rideBtnonclick() {
+        $('#ride_table').show();
+        $('#alight_table').hide();
+        $('#doughnut_chart_ride').show();
+        $('#doughnut_chart_alight').hide();
+        $('#rideBtn').css({ "font-size": 23, "text-decoration": "underline" })
+        $('#alightBtn').css({ "font-size": 15, "text-decoration": "none" })
+    }
+
+    function alightBtnonclick() {
+        $('#ride_table').hide();
+        $('#alight_table').show();
+        $('#doughnut_chart_ride').hide();
+        $('#doughnut_chart_alight').show();
+        $('#rideBtn').css({ "font-size": 15, "text-decoration": "none" })
+        $('#alightBtn').css({ "font-size": 23, "text-decoration": "underline" })
+    }
+</script>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="container-sub-2">
+
+    <button id="rideBtn" class="select_ride_alight" style="font-size: 23px; text-decoration: underline;"
+        onclick="rideBtnonclick();">승차</button>
+    <button id="alightBtn" class="select_ride_alight" style="font-size: 15px;" onclick="alightBtnonclick();">하차</button>
+
+    <!-- 승차 테이블 -->
+    <table id="ride_table" class="result_table jb-1" style="display: inline-flexbox;">
+        <th>순위</th>
+        <th>호선명</th>
+        <th>승차(건)</th>
+        {% for key, value in json_data_ride.items %}
+        <tr>
+            <td>{{ key }}</td>
+            <td class="changeColor">{{ value.line_num }}</td>
+            <td class="counter">{{ value.ride_val }}</td>
+        </tr>
+        {% endfor %}
+
+    </table>
+
+    <!-- 하차 테이블 -->
+    <table id="alight_table" class="result_table jb-1" style="display: none;">
+        <th>순위</th>
+        <th>호선명</th>
+        <th>승차(건)</th>
+        {% for key, value in json_data_alight.items %}
+        <tr>
+            <td>{{ key }}</td>
+            <td class="changeColor">{{ value.line_num }}</td>
+            <td class="counter">{{ value.alight_val }}</td>
+        </tr>
+        {% endfor %}
+
+    </table>
+
+    <canvas id="doughnut_chart_ride" class="doughnut_chart" width="435" height="315"
+        style="display: inline-flexbox;"></canvas>
+
+    <canvas id="doughnut_chart_alight" class="doughnut_chart" width="435" height="315" style="display: none;"></canvas>
+    <script>
+
+        // 장고에서 넘어온 json 데이터를 자바스크립트 변수로 활용하기 위한 파싱 작업
+
+        // ride(승차)
+        const json_pasing_ride = "{{ json_data_ride }}".replace(/&#x27;/g, "\"");
+        const json_js_ride = JSON.parse(json_pasing_ride);
+
+        // alight(하차)
+        const json_pasing_alight = "{{ json_data_alight }}".replace(/&#x27;/g, "\"");
+        const json_js_alight = JSON.parse(json_pasing_alight);
+
+        const ride_label_data = []
+        const alight_label_data = []
+        const ride_data = []
+        const alight_data = []
+
+        for (var i in json_js_ride) {
+            ride_label_data.push(json_js_ride[i]['line_num']);
+            ride_data.push(parseInt(json_js_ride[i]['ride_val'].replace(/,/gi, ''), 10));
+        }
+
+        for (var i in json_js_alight) {
+            alight_label_data.push(json_js_alight[i]['line_num']);
+            alight_data.push(parseInt(json_js_alight[i]['alight_val'].replace(/,/gi, ''), 10));
+        }
+
+        // 기타 호선들의 합 구하기
+        const ride_all = ride_data[0]
+        ride_data.shift()
+        let ride_sum = 0;
+
+        for (let i = 0; i < ride_data.length; i++) {
+            ride_sum += ride_data[i];
+        }
+
+        const etc_ride = ride_all - ride_sum
+        ride_data.push(etc_ride)
+
+        const alight_all = alight_data[0]
+        alight_data.shift()
+        let alight_sum = 0;
+
+        for (let i = 0; i < alight_data.length; i++) {
+            alight_sum += alight_data[i];
+        }
+
+        const etc_alight = alight_all - alight_sum
+        alight_data.push(etc_alight)
+
+        ride_label_data.shift()
+        ride_label_data.push('기타 호선합')
+        alight_label_data.shift()
+        alight_label_data.push('기타 호선합')
+
+        ride_backgroundColor = []
+        alight_backgroundColor = []
+
+        for (let i = 0; i < ride_label_data.length; i++) {
+            ride_backgroundColor.push(line_color[ride_label_data[i]])
+        }
+
+        for (let i = 0; i < alight_label_data.length; i++) {
+            alight_backgroundColor.push(line_color[alight_label_data[i]])
+        }
+
+        // 승차 차트 설정
+        new Chart(document.getElementById("doughnut_chart_ride"), {
+            type: 'doughnut',
+            data: {
+                labels: ride_label_data,
+                datasets: [{
+                    data: ride_data,
+                    backgroundColor: ride_backgroundColor,
+                },
+                ],
+            },
+            options: {
+                responsive: false,
+                legend: false,
+                title: {
+                    display: true,
+                    text: '호선별 전체 승차 비율(100%)',
+                    fontColor: 'black',
+                },
+                plugins: {
+                    labels: {
+                        render: function (options) {
+                            var idx = ride_data.indexOf(options.value)
+                            var value = (options.value / ride_all) * 100;
+                            var label_val = ride_label_data[idx] + '(' + value.toFixed(1) + '%)'
+
+                            return label_val;
+                        },
+                        textMargin: 5,
+                        fontSize: 9,
+                        fontColor: 'black',
+                        position: 'outside',
+                    }
+                },
+            }
+        });
+
+        // 하차 차트 설정
+        new Chart(document.getElementById("doughnut_chart_alight"), {
+            type: 'doughnut',
+            data: {
+                labels: alight_label_data,
+                datasets: [{
+                    data: alight_data,
+                    backgroundColor: alight_backgroundColor,
+                },
+                ],
+            },
+            options: {
+                responsive: false,
+                legend: false,
+                title: {
+                    display: true,
+                    text: '호선별 전체 하차 비율(100%)',
+                    fontColor: 'black',
+                },
+                plugins: {
+                    labels: {
+                        render: function (options) {
+                            var idx = alight_data.indexOf(options.value)
+                            var value = (options.value / alight_all) * 100;
+                            var label_val = alight_label_data[idx] + '(' + value.toFixed(1) + '%)'
+
+                            return label_val;
+                        },
+                        textMargin: 5,
+                        fontSize: 9,
+                        fontColor: 'black',
+                        position: 'outside',
+                    }
+                },
+            }
+        });
+    </script>
+
+</div>
+{% endblock %}
+
+{% block style %}
+<style>
+    .result_table {
+        text-align: center;
+        border: none;
+        font-size: 17px;
+        width: 335px;
+        border-collapse: separate;
+        border-spacing: 0 5px;
+        opacity: 0;
+    }
+
+    td {
+        width: 15px;
+        word-break: break-all;
+    }
+
+    .doughnut_chart {
+        position: relative;
+        float: right;
+        bottom: 320px;
+    }
+
+    .select_ride_alight {
+        border: none;
+        font-family: Hanna;
+        background-color: white;
+    }
+</style>
+{% endblock %}

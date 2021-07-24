@@ -1,0 +1,180 @@
+{% extends 'batch/base.html' %}
+
+{% block title %}원하는 통계{% endblock %}
+
+{% block script %}
+
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script>
+
+    // 호선별 색상 변경
+    const pasing_json_color = "{{ json_data_color }}".replace(/&#x27;/g, "\"");
+    const line_color = JSON.parse(pasing_json_color);
+
+    // 연관 검색어 추천
+    const pasing_json_substanm = "{{ json_data_substanm }}".replace(/&#x27;/g, "\"");
+    const json_substanm = JSON.parse(pasing_json_substanm);
+    const substanm_list = json_substanm['전체역']
+
+    $(function () {
+        $('.selectSTAname').autocomplete({
+            source: substanm_list,
+            focus: function (event, ui) {
+                return false;
+            },
+            open: function (event, ui) {
+                $(this).autocomplete("widget").css({
+                    "font-size": 15,
+                    "font-family": "Hanna"
+                });
+            },
+            minLength: 1,
+            autoFocus: true,
+        });
+    });
+
+    // 역명 선택 후 버튼 클릭 시
+    function viewResult() {
+
+        let subway_name = document.querySelector('.selectSTAname').value;
+        let json_subway_name = {
+            'name': subway_name
+        }
+
+        $.ajax({
+            url: "{% url 'selectsubwayAjax_batch' %}",
+            type: 'POST',
+            data: json_subway_name,
+            dataType: 'json',
+            success: function (json_data) {
+
+                let line_num_str = ''
+                let ride_str = ''
+                let alight_str = ''
+
+                // 역명
+                $('.result_sub_sta_nm').text(json_data.sub_sta_nm);
+
+                // 호선명
+                for (var i in json_data.line_num) {
+                    line_num_str += '<span class="changeColor">' + json_data.line_num[i] + '</span><br>'
+                }
+                $('.result_line_num').html(line_num_str);
+
+                // 승, 하차 통계
+                for (var i in json_data.value) {
+                    ride_str += '<span class="changeColor2">' + i + ': <span style="font-size:23px;">' +
+                        json_data.value[i].ride_rank + '</span>위 / </span>' +
+                        json_data.value[i].cnt + '역<br>' + json_data.value[i].ride_value + '<br>'
+
+                    alight_str += '<span class="changeColor2">' + i + ': <span style="font-size:23px;">' +
+                        json_data.value[i].alight_rank + '</span>위 / </span>' +
+                        json_data.value[i].cnt + '역<br>' + json_data.value[i].alight_value + '<br>'
+                }
+                $('.result_ride').html(ride_str);
+                $('.result_alight').html(alight_str);
+
+
+                $('.changeColor').each(function (index, element) {
+                    var selectLine = element.innerHTML
+
+                    $(`.changeColor:contains(${selectLine})`).css("color", line_color[selectLine]);
+                    $(`.changeColor2:contains(${selectLine})`).css("color", line_color[selectLine]);
+                })
+            },
+            error: function (request, status, error) {
+                alert("입력 오류 혹은 서버 오류 입니다 :(")
+                window.location.replace("{% url 'selectsubway' %}")
+            }
+        })
+
+    }
+</script>
+
+{% endblock %}
+
+
+{% block content %}
+<div class="container-sub-2">
+
+    <input type="text" class="selectSTAname" placeholder="역명을 입력해주세요 :)" />
+    <input type="button" class="viewResult" value="검색" onclick="viewResult()" />
+    <br>
+    <br>
+
+    <table class="result_table jb-1">
+        <th>역명</th>
+        <th>호선</th>
+        <th>승차 통계</th>
+        <th>하차 통계</th>
+        <tr>
+            <td class="result_sub_sta_nm">-</td>
+            <td class="result_line_num">-</td>
+            <td class="result_ride">-</td>
+            <td class="result_alight">-</td>
+        </tr>
+    </table>
+</div>
+{% endblock %}
+
+{% block style %}
+<style>
+    .selectSTAname {
+        font-family: Hanna;
+        font-size: 17px;
+        position: relative;
+        top: 7px;
+        left: 10px;
+    }
+
+    .viewResult {
+        font-family: Hanna;
+        font-size: 17px;
+        position: relative;
+        top: 7px;
+        left: 10px;
+        background-color: white;
+        border: 1px solid;
+        border-radius: 10px;
+    }
+
+    .result_table {
+        text-align: center;
+        position: relative;
+        left: 30px;
+        font-size: 17px;
+        width: 700px;
+        border-collapse: separate;
+        border-spacing: 0 7px;
+        opacity: 0;
+    }
+
+    .result_ride,
+    .result_alight {
+        font-size: 14px;
+    }
+
+    th {
+        width: 150px;
+        word-break: break-all;
+        border: 2px solid;
+    }
+
+    td {
+        width: 150px;
+        height: 190px;
+        word-break: break-all;
+        border: 2px solid;
+    }
+
+    .ui-autocomplete {
+        max-height: 250px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+        /* add padding to account for vertical scrollbar */
+        padding-right: 5px;
+    }
+</style>
+{% endblock %}
