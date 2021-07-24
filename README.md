@@ -4,7 +4,7 @@
 * 문의 사항에 정성껏 답변주신 서울 열린데이터 광장 직원분들께 큰 감사의 인사를 드립니다.   
    
 ## 실행   
-<img width="80%" src="https://user-images.githubusercontent.com/66659846/126601495-ef7f13c4-a26c-455b-bbf7-8a32f213ef7f.gif"/>   
+<img width="80%" src="https://user-images.githubusercontent.com/66659846/126858412-d9a4d57e-e051-49f2-8a8d-05c5b6f9c2e5.gif)"/>      
     
 ### 배치 계층:   
    
@@ -27,12 +27,12 @@
 3. 데이터 포맷은 JSON 형식이며, 데이터 흐름 간 가공, 동작 등은 코드 내 주석으로 설명되어 있습니다.   
    
 ## PROCESS   
-![Screenshot_263](https://user-images.githubusercontent.com/66659846/126603190-d7bb0de4-8b10-41d2-ad7e-c9cb80366ced.png)  
+![Screenshot_263](https://user-images.githubusercontent.com/66659846/126858405-13546654-0b68-411b-aed1-a8e58c27c618.png)  
    
 ## SERVERS & JPS   
 * VM 가상 서버 6대 / MobaXterm 활용 원격 작업 + local Django 서버를 통해 구성 
-![Screenshot_276](https://user-images.githubusercontent.com/66659846/126731080-e0b140b0-010f-4a80-9f13-6974e1450b64.png)   
-![Screenshot_277](https://user-images.githubusercontent.com/66659846/126731082-da703a19-909e-4725-bdf0-292d39686eeb.png)   
+![Screenshot_276](https://user-images.githubusercontent.com/66659846/126858406-60d7e4c8-149f-4cb4-b318-4d76335cf960.png)   
+![Screenshot_277](https://user-images.githubusercontent.com/66659846/126858407-5d45de5d-60b9-4b81-a5cc-5eb205eb29c6.png)   
       
 ## SAVE HDFS & HBASE & PHOENIX   
 ### 192.168.56.100:9870(hdfs), 16010(hbase), 8765(phoenix)   
@@ -57,6 +57,6 @@
 - NRA_RIDE ~ ALIGHT: 역명별 승, 하차 기록 합계 테이블   
 - NRL_RIDE ~ ALIGHT: 역명 + 호선별 승, 하차 기록 합계 테이블   
 - YRA: 연도별 승, 하차 기록 합계 테이블   
-![Screenshot_280](https://user-images.githubusercontent.com/66659846/126732024-c5e3da4b-b0e8-47b8-aefa-54ee6d95692e.png)   
-![Screenshot_281](https://user-images.githubusercontent.com/66659846/126732021-944f7f4d-c779-481d-8caf-e68d99116f4a.png)   
+![Screenshot_280](https://user-images.githubusercontent.com/66659846/126858409-1c8f55b3-2980-4086-9db2-ab5bf0dda5e1.png)   
+![Screenshot_281](https://user-images.githubusercontent.com/66659846/126858411-bf27e647-4a6a-480b-b33f-0400c223db73.png)   
 
