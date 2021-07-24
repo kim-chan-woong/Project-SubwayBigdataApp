@@ -1,6 +1,6 @@
 # Subway-Bigdata-Web   
    
-# RESULT    
+# RESULT    aa
 * 문의 사항에 정성껏 답변주신 서울 열린데이터 광장 직원분들께 큰 감사의 인사를 드립니다.   
    
 ## 실행   
