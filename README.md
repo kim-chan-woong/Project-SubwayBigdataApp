@@ -4,7 +4,7 @@
 * 문의 사항에 정성껏 답변주신 서울 열린데이터 광장 직원분들께 큰 감사의 인사를 드립니다.   
    
 ## 실행   
-<img width="80%" src="https://user-images.githubusercontent.com/66659846/126858412-d9a4d57e-e051-49f2-8a8d-05c5b6f9c2e5.gif)"/>      
+<img width="80%" src="https://user-images.githubusercontent.com/66659846/126858412-d9a4d57e-e051-49f2-8a8d-05c5b6f9c2e5.gif"/>      
     
 ### 배치 계층:   
    
